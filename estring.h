@@ -17,5 +17,7 @@ extern String* new_string(const char *val);
 
 extern String make_string(const char *val);
 
+extern void destroy_string(String *s_ptr);
+
 extern void delete_string(String **str);
 #endif

@@ -89,12 +89,16 @@ void string_init(String *str)
     str->concat_char = &concat_char;
 }
 
+void destroy_string(String *s_ptr)
+{
+    free(s_ptr->self);
+    s_ptr->self = NULL;
+    s_ptr->length = 0;
+}
+
 void delete_string(String **str)
 {
-    String * shortcut = *str;
-    free(shortcut->self);
-    shortcut->self = NULL;
-    shortcut->length = 0;
-    free(shortcut);
-    shortcut = NULL;
+    destroy_string(*str);
+    free(*str);
+    *str = NULL;
 }

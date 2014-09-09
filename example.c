@@ -22,7 +22,7 @@ int main ( void )
         &stackS
     );
     printf("%s\n", heapS->self);
-    free(stackS.self);
+    destroy_string(&stackS);
     delete_string(&heapS);
     return 0;
 }
