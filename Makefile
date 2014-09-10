@@ -1,10 +1,12 @@
 CFLAGS=-Wall -g -std=c99 -pedantic
 CC=gcc
 
-all: clean example
+all: example clean
 
-example: estring.c estring.h example.c
+example: estring.o example.c
+
+estring.o: estring.c estring.h
 
 clean:
-	@rm -f example
+	@rm -f estring.o
 	@echo "Clean OK"

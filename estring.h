@@ -1,6 +1,8 @@
 #ifndef __ESTRING_H_
 #define __ESTRING_H_ 1
 #include <string.h>
+#define P_TO_STRING(sp) (sp)->self
+#define TO_STRING(s) s.self
 #define CONCAT_STRING(to, from) (to)->concat_string((to), (from))
 #define CONCAT_CHAR(to, str) (to)->concat_char((to), str)
 
