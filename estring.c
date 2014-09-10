@@ -2,6 +2,12 @@
 #include <string.h>
 #include "estring.h"
 
+#define INLINE_DESTROY(s) do { \
+        free((s)->self); \
+        (s)->self = NULL; \
+        (s)->length = 0; \
+    } while(0)
+
 static String * concat_string(String *this, const String *from)
 {
     this->length += from->length;
@@ -91,14 +97,12 @@ void string_init(String *str)
 
 void destroy_string(String *s_ptr)
 {
-    free(s_ptr->self);
-    s_ptr->self = NULL;
-    s_ptr->length = 0;
+    INLINE_DESTROY(s_ptr);
 }
 
 void delete_string(String **str)
 {
-    destroy_string(*str);
+    INLINE_DESTROY(*str);
     free(*str);
     *str = NULL;
 }
