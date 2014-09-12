@@ -13,7 +13,7 @@ static String * concat_string(String *this, const String *from)
     this->length += from->length;
     this->self = realloc(
         this->self,
-        sizeof *this->self * this->length + 1
+        sizeof *this->self * (this->length + 1)
     );
     if (this->self == NULL)
         return NULL;
@@ -31,7 +31,7 @@ static String * concat_char(String *this, const char *add)
     this->length += add_len;
     this->self = realloc(
         this->self,
-        sizeof *this->self * this->length + 1
+        sizeof *this->self * (this->length + 1)
     );
     if (this->self == NULL)
         return NULL;
@@ -40,6 +40,52 @@ static String * concat_char(String *this, const char *add)
         add,
         add_len
     );
+    return this;
+}
+
+static String * prepend_string( String *this, const String *from)
+{
+    size_t new_len = this->length + from->length;
+    this->self = realloc(
+        this->self,
+        sizeof *this->self * (new_len + 1)
+    );
+    if (this->self == NULL)
+        return NULL;
+    memmove(
+        this->self + from->length,
+        this->self,
+        this->length
+    );
+    memcpy(
+        this->self,
+        from->self,
+        from->length
+    );
+    this->length = new_len;
+    return this;
+}
+
+String * prepend_char(String *this, const char *val)
+{
+    size_t val_len = strlen(val);
+    this->self = realloc(
+        this->self,
+        sizeof *this->self * (this->length + val_len + 1)
+    );
+    if (this->self == NULL)
+        return NULL;
+    memmove(
+        this->self + val_len,
+        this->self,
+        this->length
+    );
+    memcpy(
+        this->self,
+        val,
+        val_len
+    );
+    this->length += val_len;
     return this;
 }
 
@@ -62,6 +108,8 @@ String * new_string(const char *val)
     );
     s->concat_string = &concat_string;
     s->concat_char = &concat_char;
+    s->prepend_string = &prepend_string;
+    s->prepend_char = &prepend_char;
     return s;
 }
 
@@ -71,7 +119,9 @@ String make_string(const char *val)
         .self = NULL,
         .length = strlen(val),
         .concat_string = &concat_string,
-        .concat_char = &concat_char
+        .concat_char = &concat_char,
+        .prepend_string = &prepend_string,
+        .prepend_char = &prepend_char
     };
     s.self = malloc(sizeof s.self * s.length);
     if (s.self == NULL) {
@@ -93,6 +143,8 @@ void string_init(String *str)
     str->length = 0;
     str->concat_string = &concat_string;
     str->concat_char = &concat_char;
+    str->prepend_string = &prepend_string;
+    str->prepend_char = &prepend_char;
 }
 
 void destroy_string(String *s_ptr)

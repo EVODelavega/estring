@@ -11,20 +11,34 @@ int main ( void )
         TO_STRING(stackS),
         P_TO_STRING(heapS)
     );
+    PREPEND_CHAR(
+        &stackS,
+        "This is a heap-"
+    );
+    printf(
+        "\nPrepend literal:\n%s\n",
+        TO_STRING(stackS)
+    );
     CONCAT_CHAR(
         heapS,
         "\nConcat literal"
     );
-    printf("%s\n", P_TO_STRING(heapS));
+    printf("\nConcatenated to heap:\n%s\n", P_TO_STRING(heapS));
     CONCAT_CHAR(
         &stackS,
         "\n"
     );
-    puts(TO_STRING(stackS));
+    PREPEND_STRING(
+        heapS,
+        &stackS
+    );
+    puts("Prepend string to string:");
+    puts(P_TO_STRING(heapS));
     CONCAT_STRING(
         heapS,
         &stackS
     );
+    puts("Concatenate strings:");
     printf("%s\n", P_TO_STRING(heapS));
     destroy_string(&stackS);
     delete_string(&heapS);
