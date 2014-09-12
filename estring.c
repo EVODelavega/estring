@@ -7,7 +7,13 @@
         (s)->self = NULL; \
         (s)->length = 0; \
     } while(0)
+/**
+ * String "methods", these static functions will be assigned to String members
+ * You will be able to access them directly, but estring.h offers some macro's
+ * That make the interface just a bit more consistent
+ */
 
+//concat the value of from to the end of this
 static String * concat_string(String *this, const String *from)
 {
     this->length += from->length;
@@ -25,6 +31,7 @@ static String * concat_string(String *this, const String *from)
     return this;
 }
 
+//concat a literal, or char[] to an existing string
 static String * concat_char(String *this, const char *add)
 {
     size_t add_len = strlen(add);
@@ -43,6 +50,7 @@ static String * concat_char(String *this, const char *add)
     return this;
 }
 
+//prepend from to this
 static String * prepend_string( String *this, const String *from)
 {
     size_t new_len = this->length + from->length;
@@ -52,11 +60,13 @@ static String * prepend_string( String *this, const String *from)
     );
     if (this->self == NULL)
         return NULL;
+    //move this' value forward, to make way for from's value
     memmove(
         this->self + from->length,
         this->self,
         this->length
     );
+    //prepend from value
     memcpy(
         this->self,
         from->self,
@@ -66,6 +76,7 @@ static String * prepend_string( String *this, const String *from)
     return this;
 }
 
+//prepend literal, or char[] to existing string
 String * prepend_char(String *this, const char *val)
 {
     size_t val_len = strlen(val);
@@ -75,11 +86,13 @@ String * prepend_char(String *this, const char *val)
     );
     if (this->self == NULL)
         return NULL;
+    //same as above: make way for val
     memmove(
         this->self + val_len,
         this->self,
         this->length
     );
+    //prepend val
     memcpy(
         this->self,
         val,
@@ -88,7 +101,15 @@ String * prepend_char(String *this, const char *val)
     this->length += val_len;
     return this;
 }
+/*
+ * End of "methods"
+ **/
 
+/**
+ * Extern funciton definitions here
+ */
+
+//Create new String instance from string (literal or char[])
 String * new_string(const char *val)
 {
     String *s = malloc(sizeof *s);
@@ -100,6 +121,7 @@ String * new_string(const char *val)
         free(s);
         return NULL;
     }
+    //init first char to \0, so we can call strncat
     s->self[0] = '\0';
     strncat(
         s->self,
@@ -113,6 +135,7 @@ String * new_string(const char *val)
     return s;
 }
 
+//make string returns a stack String instance
 String make_string(const char *val)
 {
     String s = {
@@ -126,6 +149,7 @@ String make_string(const char *val)
     s.self = malloc(sizeof s.self * s.length);
     if (s.self == NULL) {
         s.self = NULL;
+        s.length = 0;
         return s;
     }
     s.self[0] = '\0';
@@ -137,6 +161,7 @@ String make_string(const char *val)
     return s;
 }
 
+//initializer for created String
 void string_init(String *str)
 {
     str->self = NULL;
@@ -147,11 +172,20 @@ void string_init(String *str)
     str->prepend_char = &prepend_char;
 }
 
+/**
+ * destroy_string takes String *, delete_string takes String **
+ * Reasoning behind this is that stack String can be "deleted" using:
+ *    destroy_string(&string); where string is of type String
+ *    delete_string(&str_ptr); where str_ptr is of type String *
+ */
+
+//destroy means: free self, restore String as if it were returned by string_init
 void destroy_string(String *s_ptr)
 {
     INLINE_DESTROY(s_ptr);
 }
 
+//delete: frees all memory, AND sets str to null, too
 void delete_string(String **str)
 {
     INLINE_DESTROY(*str);
