@@ -5,12 +5,14 @@
 int main ( void )
 {
     String stackS = make_string("Test string"),
+		   intString = make_string("123"),
            *heapS = new_string("This is on the heap");
     printf(
         "%s\n%s\n",
         TO_STRING(stackS),
         P_TO_STRING(heapS)
     );
+    printf("String to int test: %d\n", S_TO_INT(intString));
     PREPEND_CHAR(
         &stackS,
         "This is a heap-"

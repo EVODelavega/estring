@@ -7,6 +7,13 @@
         (s)->self = NULL; \
         (s)->length = 0; \
     } while(0)
+
+static String * concat_string(String *this, const String *from);
+static String * concat_char(String *this, const char *add);
+static String * prepend_string( String *this, const String *from);
+static String * prepend_char(String *this, const char *val);
+static int to_int(const String *this);
+
 /**
  * String "methods", these static functions will be assigned to String members
  * You will be able to access them directly, but estring.h offers some macro's
@@ -14,7 +21,7 @@
  */
 
 //concat the value of from to the end of this
-static String * concat_string(String *this, const String *from)
+String * concat_string(String *this, const String *from)
 {
     this->length += from->length;
     this->self = realloc(
@@ -32,7 +39,7 @@ static String * concat_string(String *this, const String *from)
 }
 
 //concat a literal, or char[] to an existing string
-static String * concat_char(String *this, const char *add)
+String * concat_char(String *this, const char *add)
 {
     size_t add_len = strlen(add);
     this->length += add_len;
@@ -51,7 +58,7 @@ static String * concat_char(String *this, const char *add)
 }
 
 //prepend from to this
-static String * prepend_string( String *this, const String *from)
+String * prepend_string( String *this, const String *from)
 {
     size_t new_len = this->length + from->length;
     this->self = realloc(
@@ -101,6 +108,15 @@ String * prepend_char(String *this, const char *val)
     this->length += val_len;
     return this;
 }
+
+//convert string to int...
+int to_int(const String *this)
+{
+	if (this->self == NULL)
+		return 0;
+	return atoi(this->self);
+}
+
 /*
  * End of "methods"
  **/
@@ -132,6 +148,7 @@ String * new_string(const char *val)
     s->concat_char = &concat_char;
     s->prepend_string = &prepend_string;
     s->prepend_char = &prepend_char;
+    s->to_int = &to_int;
     return s;
 }
 
@@ -144,7 +161,8 @@ String make_string(const char *val)
         .concat_string = &concat_string,
         .concat_char = &concat_char,
         .prepend_string = &prepend_string,
-        .prepend_char = &prepend_char
+        .prepend_char = &prepend_char,
+        .to_int = &to_int
     };
     s.self = malloc(sizeof s.self * s.length);
     if (s.self == NULL) {
@@ -170,6 +188,7 @@ void string_init(String *str)
     str->concat_char = &concat_char;
     str->prepend_string = &prepend_string;
     str->prepend_char = &prepend_char;
+    str->to_int = &to_int;
 }
 
 /**
