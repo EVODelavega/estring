@@ -6,13 +6,28 @@ int main ( void )
 {
     String stackS = make_string("Test string"),
 		   intString = make_string("123"),
+		   dblString = make_string(" 12.3"),
            *heapS = new_string("This is on the heap");
+    int test_int;
+    double test_double;
+    S_TO_NUM(intString, &test_int);
+    S_TO_NUM(dblString, &test_double);
+    destroy_string(
+		&intString
+	);
+	destroy_string(
+		&dblString
+	);
     printf(
         "%s\n%s\n",
         TO_STRING(stackS),
         P_TO_STRING(heapS)
     );
-    printf("String to int test: %d\n", S_TO_INT(intString));
+    printf(
+		"String to int test: %d\nString to double test: %f\n",
+		test_int,
+		test_double
+	);
     PREPEND_CHAR(
         &stackS,
         "This is a heap-"

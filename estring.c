@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "estring.h"
 
 #define INLINE_DESTROY(s) do { \
@@ -12,7 +13,7 @@ static String * concat_string(String *this, const String *from);
 static String * concat_char(String *this, const char *add);
 static String * prepend_string( String *this, const String *from);
 static String * prepend_char(String *this, const char *val);
-static int to_int(const String *this);
+static int to_num(const String *this, void *destination);
 
 /**
  * String "methods", these static functions will be assigned to String members
@@ -109,12 +110,36 @@ String * prepend_char(String *this, const char *val)
     return this;
 }
 
-//convert string to int...
-int to_int(const String *this)
+//convert string to int, float double...
+//TODO: use format, or macro's to cast the destination
+//instead of guessing the destination type
+int to_num(const String *this, void *destination)
 {
+	*(int *)destination = 0;//cast to int *, most reliable & compatible
 	if (this->self == NULL)
+		return -1;
+	int dec_sep = 0;
+	char *val = this->self;
+	size_t sub_len = 0;
+	while (isspace(*val))
+		++val;//skip leading whitespace
+	while (isdigit(*(val+sub_len)) || *(val+sub_len) == '.')
+	{
+		if (*(val+sub_len) == '.')
+		{
+			if (dec_sep)
+				break;
+			dec_sep = 1;
+		}
+		++sub_len;
+	}
+	if (sub_len == 0)
 		return 0;
-	return atoi(this->self);
+	if (dec_sep == 1)
+		*(double *)destination = atof(val);
+	else
+		*(int *)destination = atoi(val);
+	return (int) sub_len;
 }
 
 /*
@@ -148,7 +173,7 @@ String * new_string(const char *val)
     s->concat_char = &concat_char;
     s->prepend_string = &prepend_string;
     s->prepend_char = &prepend_char;
-    s->to_int = &to_int;
+    s->to_num = &to_num;
     return s;
 }
 
@@ -162,10 +187,11 @@ String make_string(const char *val)
         .concat_char = &concat_char,
         .prepend_string = &prepend_string,
         .prepend_char = &prepend_char,
-        .to_int = &to_int
+        .to_num = &to_num
     };
     s.self = malloc(sizeof s.self * s.length);
-    if (s.self == NULL) {
+    if (s.self == NULL)
+    {
         s.self = NULL;
         s.length = 0;
         return s;
@@ -188,7 +214,7 @@ void string_init(String *str)
     str->concat_char = &concat_char;
     str->prepend_string = &prepend_string;
     str->prepend_char = &prepend_char;
-    str->to_int = &to_int;
+    str->to_num = &to_num;
 }
 
 /**

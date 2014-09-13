@@ -7,8 +7,8 @@
 #define CONCAT_CHAR(to, str) (to)->concat_char((to), str)
 #define PREPEND_CHAR(to, str) (to)->prepend_char((to), str)
 #define PREPEND_STRING(to, from) (to)->prepend_string((to), (from))
-#define S_TO_INT(s) (s).to_int(&(s))
-#define SP_TO_INT(sp) (sp)->to_int(sp)
+#define S_TO_NUM(s, num) (s).to_num(&(s), num)
+#define SP_TO_NUM(sp, num) (sp)->to_num(sp, num)
 
 typedef struct string_t {
     char *self;
@@ -17,7 +17,7 @@ typedef struct string_t {
     struct string_t *(*concat_char)();
     struct string_t *(*prepend_string)();
     struct string_t *(*prepend_char)();
-    int (*to_int)();
+    int (*to_num)();
 } String;
 
 extern void string_init(String *str);
