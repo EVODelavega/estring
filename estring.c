@@ -13,7 +13,7 @@ static String * concat_string(String *this, const String *from);
 static String * concat_char(String *this, const char *add);
 static String * prepend_string( String *this, const String *from);
 static String * prepend_char(String *this, const char *val);
-static int to_num(const String *this, void *destination);
+static int to_num(const String *this, void *destination, const char *type);
 
 /**
  * String "methods", these static functions will be assigned to String members
@@ -113,19 +113,19 @@ String * prepend_char(String *this, const char *val)
 //convert string to int, float double...
 //TODO: use format, or macro's to cast the destination
 //instead of guessing the destination type
-int to_num(const String *this, void *destination)
+int to_num(const String *this, void *destination, const char *type)
 {
-	*(int *)destination = 0;//cast to int *, most reliable & compatible
+	*(int *)destination = 0;//int should be safe?
 	if (this->self == NULL)
 		return -1;
 	int dec_sep = 0;
-	char *val = this->self;
-	size_t sub_len = 0;
-	while (isspace(*val))
-		++val;//skip leading whitespace
-	while (isdigit(*(val+sub_len)) || *(val+sub_len) == '.')
+	size_t sub_len=0;
+	char *val = this->self;//shortcut...
+	while(isspace(*val))
+		++val;
+	while (isdigit(*(val +sub_len)) || *(val +sub_len) == '.')
 	{
-		if (*(val+sub_len) == '.')
+		if (*(val + sub_len) == '.')
 		{
 			if (dec_sep)
 				break;
@@ -135,11 +135,25 @@ int to_num(const String *this, void *destination)
 	}
 	if (sub_len == 0)
 		return 0;
-	if (dec_sep == 1)
-		*(double *)destination = atof(val);
-	else
-		*(int *)destination = atoi(val);
-	return (int) sub_len;
+	switch (type[1])
+	{
+		case 'd':
+			*(int *)destination = atoi(val);
+			break;
+		case 'f':
+			*(double *)destination = strtod(val, NULL);
+			break;
+		case 'z':
+			*(size_t *)destination = strtoul(val, NULL, 10);
+			break;
+		case 'u':
+			*(unsigned long long *)destination = strtoul(val, NULL, 10);
+			break;
+		default://default to bigger type?
+			*(long long *)destination = strtol(val, NULL, 10);
+
+	}
+	return sub_len;
 }
 
 /*

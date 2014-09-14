@@ -10,8 +10,8 @@ int main ( void )
            *heapS = new_string("This is on the heap");
     int test_int;
     double test_double;
-    S_TO_NUM(intString, &test_int);
-    S_TO_NUM(dblString, &test_double);
+    S_TO_NUM(intString, &test_int, NUM_INT);
+    S_TO_NUM(dblString, &test_double, NUM_DOUBLE);
     destroy_string(
 		&intString
 	);

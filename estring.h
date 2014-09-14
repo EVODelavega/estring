@@ -7,8 +7,14 @@
 #define CONCAT_CHAR(to, str) (to)->concat_char((to), str)
 #define PREPEND_CHAR(to, str) (to)->prepend_char((to), str)
 #define PREPEND_STRING(to, from) (to)->prepend_string((to), (from))
-#define S_TO_NUM(s, num) (s).to_num(&(s), num)
-#define SP_TO_NUM(sp, num) (sp)->to_num(sp, num)
+#define S_TO_NUM(s, num, t) (s).to_num(&(s), num, t)
+#define SP_TO_NUM(sp, num, t) (sp)->to_num(sp, num, t)
+#define NUM_DOUBLE "%f"
+#define NUM_INT "%d"
+#define NUM_SIZE "%zu"
+#define NUN_LL "%p"
+#define NUM_ULL "%u"
+
 
 typedef struct string_t {
     char *self;
